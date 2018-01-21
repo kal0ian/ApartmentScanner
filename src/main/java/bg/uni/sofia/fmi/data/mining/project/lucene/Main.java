@@ -10,15 +10,16 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException, ParseException, InterruptedException {
-        Indexer indexer = new Indexer("C:\\ApartmentIndex");
+        Long t0 = System.currentTimeMillis();
+    	Indexer indexer = new Indexer("E:\\Index");
         ApartmentDocumentCreator apartmentDocumentCreator = new ApartmentDocumentCreator();
-        List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new File("C:\\ApartmentScanner_copy"));
+        List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new File("E:\\ApartmentScanner"));
         indexer.indexDocuments(documents);
         indexer.close();
-        Thread.sleep(1000);
-        Searcher.search(indexer.getIndexDir(),"СЃРѕР»Р°СЂРµРЅ Р±РѕР№Р»РµСЂ");
+        //Thread.sleep(1000);
+        Searcher.search(indexer.getIndexDir(),"но соларен бойлер");
         //Searcher.search(FSDirectory.open(new File("C:\\ApartmentIndex").toPath()),"СЃРѕР»Р°СЂРµРЅ Р±РѕР№Р»РµСЂ");
-
+        System.out.println(System.currentTimeMillis() - t0);
 
     }
 }
