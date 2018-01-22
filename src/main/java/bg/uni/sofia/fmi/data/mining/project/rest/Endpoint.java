@@ -1,15 +1,62 @@
 package bg.uni.sofia.fmi.data.mining.project.rest;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import bg.uni.sofia.fmi.data.mining.project.lucene.*;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.classic.ParseException;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/")
 public class Endpoint {
 
-    @POST
-    @Path("/sayHello")
-    public String sayHello(@QueryParam("searchText") String searchText) {
-        return searchText;
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/search")
+    public List<ResultApartment> sayHello(@QueryParam("searchText") String searchText) throws IOException, ParseException {
+        Indexer indexer = new Indexer("C:\\ApartmentIndex");
+        ApartmentDocumentCreator apartmentDocumentCreator = new ApartmentDocumentCreator();
+        List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new File("C:\\ApartmentScanner_copy"));
+        indexer.indexDocuments(documents);
+        indexer.close();
+        List<String> resultFilesPaths = Searcher.search(indexer.getIndexDir(),searchText);
+        List<ResultApartment> results = new ArrayList<>();
+        for(String pathToFile:resultFilesPaths){
+            results.add(createResultApartment(parse(new File(pathToFile))));
+        }
+        return results;
+    }
+
+    private List<String> parse(File file) {
+        List<String> lines = new ArrayList<>();
+        String line = "";
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
+    }
+
+    private ResultApartment createResultApartment(List<String> fields){
+        ResultApartment resultApartment = new ResultApartment();
+        resultApartment.setTitle(fields.get(0));
+        resultApartment.setPrice(fields.get(1));
+        resultApartment.setContent(fields.get(2));
+        resultApartment.setAddress(fields.get(3));
+        resultApartment.setArea(fields.get(4));
+        resultApartment.setFloor(fields.get(5));
+        resultApartment.setConstruction_type(fields.get(6));
+        resultApartment.setTelephone(fields.get(7));
+        resultApartment.setUrl(fields.get(8));
+        return  resultApartment;
     }
 }

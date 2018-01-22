@@ -28,79 +28,38 @@
 			</div>
 		</div>
 		
-		<div class="container">
+		<div id="searchResults" class="container">
 			<hgroup class="mb20">
 				<h1>Search Results</h1>
-				<h2 class="lead"><strong class="text-danger">3</strong> results were found for the search for <strong class="text-danger">Lorem</strong></h2>								
+				<h2 id="searchInformation" class="lead"></h2>
 			</hgroup>
 
-			<section class="col-xs-12 col-sm-6 col-md-12">
-				<article class="search-result row">
-					<div class="col-xs-12 col-sm-12 col-md-3">
-						<a href="#" class="thumbnail"><img src="./logo.png" /></a>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-2">
-						<ul class="meta-search">
-							<li><i class="glyphicon glyphicon-home"></i> <span>Квадратура: 96 кв.м</span></li>
-							<li><i class="glyphicon glyphicon-th-large"></i> <span>Етаж: 3</span></li>
-							<li><i class="glyphicon glyphicon-earphone"></i> <span>Телефона: 0878123456</span></li>
-						</ul>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-7 excerpet">
-						<h3><a href="#" title="">Продава Къща</a></h3>
-						<p>Двуетажна къща с РЗП 42м2, с терасирано дворно място от 660м2 с кладенец и овощни дървета, сред живописна гориста местност. Първият етаж се състои от кухня, дневна, трапезария, сервизни помещения. На втория етаж има две стаи и сервизни помещения. За повече информация - Цветелина Рашкова, телефон 02/9886723, 0879/889151. Още подобни оферти може да видите на адрес: www.realnet.bg</p>
-					</div>
-					<span class="clearfix borda"></span>
-				</article>
-
-				<article class="search-result row">
-					<div class="col-xs-12 col-sm-12 col-md-3">
-						<a href="#" class="thumbnail"><img src="./logo.png" /></a>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-2">
-                        <ul class="meta-search">
-                            <li><i class="glyphicon glyphicon-home"></i> <span>Квадратура: 96 кв.м</span></li>
-                            <li><i class="glyphicon glyphicon-th-large"></i> <span>Етаж: 3</span></li>
-                            <li><i class="glyphicon glyphicon-earphone"></i> <span>Телефона: 0878123456</span></li>
-                        </ul>
-					</div>
-                    <div class="col-xs-12 col-sm-12 col-md-7 excerpet">
-                        <h3><a href="#" title="">Продава Къща</a></h3>
-                        <p>Двуетажна къща с РЗП 42м2, с терасирано дворно място от 660м2 с кладенец и овощни дървета, сред живописна гориста местност. Първият етаж се състои от кухня, дневна, трапезария, сервизни помещения. На втория етаж има две стаи и сервизни помещения. За повече информация - Цветелина Рашкова, телефон 02/9886723, 0879/889151. Още подобни оферти може да видите на адрес: www.realnet.bg</p>
-                    </div>
-					<span class="clearfix borda"></span>
-				</article>
-
-				<article class="search-result row">
-					<div class="col-xs-12 col-sm-12 col-md-3">
-						<a href="#" class="thumbnail"><img src="./logo.png"/></a>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-2">
-                        <ul class="meta-search">
-                            <li><i class="glyphicon glyphicon-home"></i> <span>Квадратура: 96 кв.м</span></li>
-                            <li><i class="glyphicon glyphicon-th-large"></i> <span>Етаж: 3</span></li>
-                            <li><i class="glyphicon glyphicon-earphone"></i> <span>Телефона: 0878123456</span></li>
-                        </ul>
-					</div>
-                    <div class="col-xs-12 col-sm-12 col-md-7 excerpet">
-                        <h3><a href="#" title="">Продава Къща</a></h3>
-                        <p>Двуетажна къща с РЗП 42м2, с терасирано дворно място от 660м2 с кладенец и овощни дървета, сред живописна гориста местност. Първият етаж се състои от кухня, дневна, трапезария, сервизни помещения. На втория етаж има две стаи и сервизни помещения. За повече информация - Цветелина Рашкова, телефон 02/9886723, 0879/889151. Още подобни оферти може да видите на адрес: www.realnet.bg</p>
-                    </div>
-					<span class="clearfix border"></span>
-				</article>			
-
-			</section>
+			<section id="advertisments" class="col-xs-12 col-sm-6 col-md-12"></section>
 		</div>
 	</body>
 	<script>
-	
+	$("#searchResults").hide();
+
 	  $(".submit").click(function() {
 		    var searchText = document.getElementById('searchText').value;
             $.ajax({
-                type : "POST",
-                url : "rest/sayHello?searchText="+searchText,
+                type : "GET",
+                url : "rest/search?searchText="+searchText,
                 success : function(data) {
-                    alert("You searched for "+ data);
+                	var invitations = '';
+
+			        for(var i=0;i<data.length;i++){
+			            var content = data[i].content;
+                        content = truncateText(content,200);
+				        invitations=invitations.concat('<article class="search-result row"><div class="col-xs-12 col-sm-12 col-md-3"><a href="#" class="thumbnail"><img src="./logo.png" /></a></div><div class="col-xs-12 col-sm-12 col-md-2"><ul class="meta-search"><li><i class="glyphicon glyphicon-usd"></i> <span>Цена: ' +data[i].price+'</span></li><li><i class="glyphicon glyphicon-home"></i> <span>Квадратура: ' +data[i].area+'</span></li><li><i class="glyphicon glyphicon-th-large"></i> <span>Етаж: '+data[i].floor+'</span></li><li><i class="glyphicon glyphicon-earphone"></i> <span>Телефон: '+data[i].telephone+'</span></li></ul></div><div class="col-xs-12 col-sm-12 col-md-7 excerpet"><h3><a href="'+data[i].url+'" title="">'+data[i].title+'</a></h3><p>'+content+'</p></div><span class="clearfix borda"></span></article>');
+			        }
+			        var node = document.getElementById('advertisments');
+			        node.innerHTML=invitations;
+
+                    var searchInfo = document.getElementById('searchInformation');
+                    searchInfo.innerHTML='<strong class="text-danger">'+data.length+'</strong> results were found for the search for <strong class="text-danger">'+searchText+'</strong>';
+
+                    $("#searchResults").show();
                 },
                 error: function(xhr, textStatus, errorThrown){
                     alert("ERROR!!! Make sure that the token and facebook group id are valid!");

@@ -19,9 +19,9 @@ public class Indexer {
     private IndexWriter indexWriter;
     private Directory indexDir;
 
-    public Indexer(String dirPath) throws FileNotFoundException, IOException {
+    public Indexer(String dirPath) throws IOException {
         indexDir = createIndexDir(dirPath);
-        Analyzer analyzer = new StandardAnalyzer(new FileReader(new Utils().getStopWordsFileFromResources())); 
+        Analyzer analyzer = new StandardAnalyzer(new FileReader(new Utils().getStopWordsFileFromResources()));
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         indexWriter = createIndexWriter(indexDir, indexWriterConfig);
@@ -37,6 +37,9 @@ public class Indexer {
 
     public void indexDocuments(List<Document> documents) {
         for (Document doc : documents) {
+            if(doc == null){
+                continue;
+            }
             indexDocument(doc);
         }
     }

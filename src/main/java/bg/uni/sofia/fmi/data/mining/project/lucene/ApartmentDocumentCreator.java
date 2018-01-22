@@ -4,11 +4,9 @@ import org.apache.lucene.document.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+
 
 public class ApartmentDocumentCreator extends DocumentCreator {
 
@@ -31,16 +29,15 @@ public class ApartmentDocumentCreator extends DocumentCreator {
 
     private List<String> parse(File file) {
         List<String> lines = new ArrayList<>();
-        String line = "";
+        String line;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             while ((line = br.readLine()) != null) {
-            	lines.add(line);
-                //System.out.println(line);
+                lines.add(line);
+                System.out.println(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return lines;
     }
 }
