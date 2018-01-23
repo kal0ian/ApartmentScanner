@@ -3,7 +3,6 @@ package bg.uni.sofia.fmi.data.mining.project.lucene;
 import org.apache.lucene.document.*;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 

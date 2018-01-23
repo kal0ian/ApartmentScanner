@@ -3,6 +3,7 @@ package bg.uni.sofia.fmi.data.mining.project.rest;
 import bg.uni.sofia.fmi.data.mining.project.lucene.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.store.FSDirectory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -20,12 +21,8 @@ public class Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
     public List<ResultApartment> sayHello(@QueryParam("searchText") String searchText) throws IOException, ParseException {
-        Indexer indexer = new Indexer("C:\\ApartmentIndex");
-        ApartmentDocumentCreator apartmentDocumentCreator = new ApartmentDocumentCreator();
-        List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new File("C:\\ApartmentScanner_copy"));
-        indexer.indexDocuments(documents);
-        indexer.close();
-        List<String> resultFilesPaths = Searcher.search(indexer.getIndexDir(),searchText);
+    	File indexDir = new File(Constants.INDEX_DIRECTORY);
+        List<String> resultFilesPaths = Searcher.search(FSDirectory.open(indexDir.toPath()),searchText);
         List<ResultApartment> results = new ArrayList<>();
         for(String pathToFile:resultFilesPaths){
             results.add(createResultApartment(parse(new File(pathToFile))));

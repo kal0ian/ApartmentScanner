@@ -6,8 +6,12 @@ def getNextPage():
 	pageBase = "https://www.imot.bg/pcgi/imot.cgi?act=3&slink=3f2cvk&f1="
 	linkList = list()
 	for x in range(1,26):
-		page = requests.get(pageBase+str(x))
-		crawlPageAndGetLink(page, linkList)
+		try:
+			page = requests.get(pageBase+str(x))
+			crawlPageAndGetLink(page, linkList)
+		except Exception as e:
+			print("Exception at page "+str(x))
+			continue
 	getAdsDetails(linkList)
 
 
@@ -31,6 +35,9 @@ def getAdsDetails(linkList):
 			print('fileunicode'+str(i))
 			if(os.path.isfile('E:\\ApartmentScanner\\apartment'+str(i))) :
 				os.remove('E:\\ApartmentScanner\\apartment'+str(i))
+			continue
+		except Exception as e:
+			print('Exception at file'+str(i))
 			continue
 
 def saveAdToFile(url, i):
@@ -65,7 +72,7 @@ def getPrice(bs):
 	return bs.find_all('div', class_='pricePhoto')[0].get_text().strip()
 
 def getDescription(bs):
-	return bs.find_all('div', id='description_div')[0].get_text().strip()
+	return bs.find_all('div', id='description_div')[0].get_text().replace("Виж по-малко... Виж повече", "").strip()
 
 def getLocation(bs):
 	return bs.find_all('span', style="font-size:16px; font-weight:bold;")[0].get_text().strip()
@@ -74,7 +81,7 @@ def getMainInfo(bs):
 	l = bs.find_all('table', width='344', cellspacing='0', cellpadding='0', border='0', style="margin-top:7px;")[0].find_all('td')
 	resultList = list()
 	resultList.append(l[1].get_text().strip())
-	resultList.append(l[3].get_text().strip())
+	resultList.append(l[4].get_text().strip())
 	resultList.append(l[10].get_text().strip())
 	return resultList
 

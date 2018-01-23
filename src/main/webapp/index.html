@@ -41,31 +41,41 @@
 	$("#searchResults").hide();
 
 	  $(".submit").click(function() {
-		    var searchText = document.getElementById('searchText').value;
-            $.ajax({
-                type : "GET",
-                url : "rest/search?searchText="+searchText,
-                success : function(data) {
-                	var invitations = '';
-
-			        for(var i=0;i<data.length;i++){
-			            var content = data[i].content;
-                        content = truncateText(content,200);
-				        invitations=invitations.concat('<article class="search-result row"><div class="col-xs-12 col-sm-12 col-md-3"><a href="#" class="thumbnail"><img src="./logo.png" /></a></div><div class="col-xs-12 col-sm-12 col-md-2"><ul class="meta-search"><li><i class="glyphicon glyphicon-usd"></i> <span>Цена: ' +data[i].price+'</span></li><li><i class="glyphicon glyphicon-home"></i> <span>Квадратура: ' +data[i].area+'</span></li><li><i class="glyphicon glyphicon-th-large"></i> <span>Етаж: '+data[i].floor+'</span></li><li><i class="glyphicon glyphicon-earphone"></i> <span>Телефон: '+data[i].telephone+'</span></li></ul></div><div class="col-xs-12 col-sm-12 col-md-7 excerpet"><h3><a href="'+data[i].url+'" title="">'+data[i].title+'</a></h3><p>'+content+'</p></div><span class="clearfix borda"></span></article>');
-			        }
-			        var node = document.getElementById('advertisments');
-			        node.innerHTML=invitations;
-
-                    var searchInfo = document.getElementById('searchInformation');
-                    searchInfo.innerHTML='<strong class="text-danger">'+data.length+'</strong> results were found for the search for <strong class="text-danger">'+searchText+'</strong>';
-
-                    $("#searchResults").show();
-                },
-                error: function(xhr, textStatus, errorThrown){
-                    alert("ERROR!!! Make sure that the token and facebook group id are valid!");
-                }
-            });
+		    getResults();
 	  });
+
+	 $("#searchText").keyup(function(event){
+	        if(event.keyCode == '13'){
+	        	getResults();
+	        }
+	    });
+	  
+	 function getResults() {
+	  	var searchText = document.getElementById('searchText').value;
+      	$.ajax({
+          type : "GET",
+          url : "rest/search?searchText="+searchText,
+          success : function(data) {
+          	var invitations = '';
+
+		        for(var i=0;i<data.length;i++){
+		            var content = data[i].content;
+                  content = truncateText(content,200);
+			        invitations=invitations.concat('<article class="search-result row"><div class="col-xs-12 col-sm-12 col-md-3"><a href="#" class="thumbnail"><img src="./logo.png" /></a></div><div class="col-xs-12 col-sm-12 col-md-2"><ul class="meta-search"><li><i class="glyphicon glyphicon-usd"></i> <span>Цена: ' +data[i].price+'</span></li><li><i class="glyphicon glyphicon-home"></i> <span>Квадратура: ' +data[i].area+'</span></li><li><i class="glyphicon glyphicon-th-large"></i> <span>Етаж: '+data[i].floor+'</span></li><li><i class="glyphicon glyphicon-earphone"></i> <span>Телефон: '+data[i].telephone+'</span></li></ul></div><div class="col-xs-12 col-sm-12 col-md-7 excerpet"><h3><a target="_blank" href="'+data[i].url+'" title="">'+data[i].title+'</a></h3><p>'+content+'</p></div><span class="clearfix borda"></span></article>');
+		        }
+		        var node = document.getElementById('advertisments');
+		        node.innerHTML=invitations;
+
+              var searchInfo = document.getElementById('searchInformation');
+              searchInfo.innerHTML='<strong class="text-danger">'+data.length+'</strong> results were found for the search for <strong class="text-danger">'+searchText+'</strong>';
+
+              $("#searchResults").show();
+          },
+          error: function(xhr, textStatus, errorThrown){
+              alert("ERROR!!! Make sure that the token and facebook group id are valid!");
+          }
+      	});
+	  }
 
 	function truncateText(text, maxLength) {
         if (text.length > maxLength) {

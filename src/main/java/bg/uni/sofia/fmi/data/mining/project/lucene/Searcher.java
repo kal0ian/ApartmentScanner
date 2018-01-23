@@ -29,6 +29,8 @@ public final class Searcher {
         List<String> resultFilesPaths = new ArrayList<>();
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document doc = indexSearcher.doc(scoreDoc.doc);
+            System.out.println(doc.get("path_to_file") +" score: "+ scoreDoc.score);
+            System.out.println(indexSearcher.explain(query, scoreDoc.doc));
             resultFilesPaths.add(doc.get("path_to_file")); //parameter
         }
         indexReader.close();

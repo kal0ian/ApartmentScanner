@@ -1,7 +1,5 @@
 package bg.uni.sofia.fmi.data.mining.project.lucene;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 public class ResultApartment {
     public String title;
     public String price;
