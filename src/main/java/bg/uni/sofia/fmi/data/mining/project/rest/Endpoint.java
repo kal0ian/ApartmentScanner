@@ -1,8 +1,9 @@
 package bg.uni.sofia.fmi.data.mining.project.rest;
 
 import bg.uni.sofia.fmi.data.mining.project.lucene.*;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.spell.SpellChecker;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import javax.ws.rs.*;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Path("/")
@@ -20,7 +22,7 @@ public class Endpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
-    public List<ResultApartment> sayHello(@QueryParam("searchText") String searchText) throws IOException, ParseException {
+    public List<ResultApartment> search(@QueryParam("searchText") String searchText) throws IOException, ParseException {
     	File indexDir = new File(Constants.INDEX_DIRECTORY);
         List<String> resultFilesPaths = Searcher.search(FSDirectory.open(indexDir.toPath()),searchText);
         List<ResultApartment> results = new ArrayList<>();
@@ -28,6 +30,18 @@ public class Endpoint {
             results.add(createResultApartment(parse(new File(pathToFile))));
         }
         return results;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/spellcheck")
+    public List<String> spellcheck(@QueryParam("misspellText") String misspellText) throws IOException, ParseException {
+        File dir = new File(Constants.SPELLCHECK_INDEX_DIRECTORY);
+        Directory directory = FSDirectory.open(dir.toPath());
+        SpellChecker spellchecker = new SpellChecker(directory);
+        String[] suggestions = spellchecker.suggestSimilar(misspellText, 3);
+        spellchecker.close();
+        return Arrays.asList(suggestions);
     }
 
     private List<String> parse(File file) {

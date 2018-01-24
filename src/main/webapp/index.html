@@ -31,6 +31,7 @@
 		<div id="searchResults" class="container">
 			<hgroup class="mb20">
 				<h1>Search Results</h1>
+                <h2 id="spellSuggestion" class="lead"></h2>
 				<h2 id="searchInformation" class="lead"></h2>
 			</hgroup>
 
@@ -57,7 +58,11 @@
           url : "rest/search?searchText="+searchText,
           success : function(data) {
           	var invitations = '';
-
+                if(data.length == 0){
+                    checkSpelling(searchText);
+                }else{
+                    $("#spellSuggestion").hide();
+                }
 		        for(var i=0;i<data.length;i++){
 		            var content = data[i].content;
                   content = truncateText(content,200);
@@ -72,7 +77,28 @@
               $("#searchResults").show();
           },
           error: function(xhr, textStatus, errorThrown){
-              alert("ERROR!!! Make sure that the token and facebook group id are valid!");
+              alert("ERROR!!!");
+          }
+      	});
+	  }
+
+	 function checkSpelling(spellcheckText) {
+	  	var spellSuggestion = document.getElementById('spellSuggestion');
+      	$.ajax({
+          type : "GET",
+          url : "rest/spellcheck?misspellText="+spellcheckText,
+          success : function(data) {
+            var suggestion="";
+            if(data.length != 0){
+                for(var i=0;i<data.length;i++){
+			        suggestion=suggestion.concat(data[i]+' ');
+		        }
+                spellSuggestion.innerHTML='Do you mean: ' + suggestion;
+                $("#spellSuggestion").show();
+            }
+          },
+          error: function(xhr, textStatus, errorThrown){
+              alert("ERROR!!!");
           }
       	});
 	  }
