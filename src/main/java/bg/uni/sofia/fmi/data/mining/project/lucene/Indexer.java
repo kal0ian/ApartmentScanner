@@ -8,10 +8,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 public class Indexer {
@@ -21,7 +18,7 @@ public class Indexer {
 
     public Indexer(String dirPath) throws IOException {
         indexDir = createIndexDir(dirPath);
-        Analyzer analyzer = new StandardAnalyzer();
+        Analyzer analyzer = new StandardAnalyzer(new FileReader(new Utils().getStopWordsFileFromResources()));
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         indexWriter = createIndexWriter(indexDir, indexWriterConfig);

@@ -54,20 +54,24 @@ public class Endpoint {
             suggestionsMatrix[i] = spellcheck(terms[i]);
         }
 
-        List<String> randomSuggestions = new ArrayList<>();
-        for(int i=0;i<20;i++){
-            String tempSuggestion = "";
-            for(int j=0;j<suggestionsMatrix.length;j++){
-                Random rnd = new Random();
-                int randomNumber = rnd.nextInt(suggestionsMatrix[j].length);
-                tempSuggestion+=suggestionsMatrix[j][randomNumber];
-            }
-            randomSuggestions.add(tempSuggestion);
-        }
+//        List<String> randomSuggestions = new ArrayList<>();
+//        for(int i=0;i<50;i++){
+//            String tempSuggestion = "";
+//            for(int j=0;j<suggestionsMatrix.length;j++){
+//                Random rnd = new Random();
+//                int randomNumber = rnd.nextInt(suggestionsMatrix[j].length);
+//                tempSuggestion+=suggestionsMatrix[j][randomNumber]+" ";
+//            }
+//            System.out.println(tempSuggestion);
+//            randomSuggestions.add(tempSuggestion);
+//        }
+
+        List<String> randomSuggestions = combine(suggestionsMatrix);
 
         int maxScore=0;
         String bestSuggestion="";
         for(String suggestion:randomSuggestions){
+            System.out.println(suggestion);
             int currentScore = search(suggestion).size();
             if(currentScore>maxScore){
                 maxScore=currentScore;
@@ -76,6 +80,7 @@ public class Endpoint {
         }
         return bestSuggestion;
     }
+
     private List<String> parse(File file) {
         List<String> lines = new ArrayList<>();
         String line = "";
@@ -101,5 +106,35 @@ public class Endpoint {
         resultApartment.setTelephone(fields.get(7));
         resultApartment.setUrl(fields.get(8));
         return  resultApartment;
+    }
+
+    private List<String> combine(String[][] matrix) {
+        int sizeArray[] = new int[matrix.length];
+        int counterArray[] = new int[matrix.length];
+        int total = 1;
+        for (int i = 0; i < matrix.length; ++i) {
+            sizeArray[i] = matrix[i].length;
+            total *= matrix[i].length;
+        }
+        List<String> list = new ArrayList<>(total);
+        StringBuilder sb;
+        for (int count = total; count > 0; --count) {
+            sb = new StringBuilder();
+            for (int i = 0; i < matrix.length; ++i) {
+                sb.append(matrix[i][counterArray[i]]);
+                if(i!= matrix.length-1){
+                    sb.append(" ");
+                }
+            }
+            list.add(sb.toString());
+            for (int incIndex = matrix.length - 1; incIndex >= 0; --incIndex) {
+                if (counterArray[incIndex] + 1 < sizeArray[incIndex]) {
+                    ++counterArray[incIndex];
+                    break;
+                }
+                counterArray[incIndex] = 0;
+            }
+        }
+        return list;
     }
 }

@@ -12,6 +12,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,9 @@ public final class Searcher {
     public static List<String> search(Directory indexDir, String queryString) throws IOException, ParseException {
         IndexReader indexReader = DirectoryReader.open(indexDir);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-        QueryParser queryParser = new QueryParser("content", new StandardAnalyzer());
+        QueryParser queryParser = new QueryParser("content", new StandardAnalyzer(new FileReader(new Utils().getStopWordsFileFromResources())));
         Query query = queryParser.parse(queryString);
-        TopDocs topDocs = indexSearcher.search(query, 20);
+        TopDocs topDocs = indexSearcher.search(query, 200);
         List<String> resultFilesPaths = new ArrayList<>();
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document doc = indexSearcher.doc(scoreDoc.doc);
