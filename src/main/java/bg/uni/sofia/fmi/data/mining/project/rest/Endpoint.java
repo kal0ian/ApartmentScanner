@@ -13,8 +13,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Path("/")
 public class Endpoint {
@@ -33,17 +33,49 @@ public class Endpoint {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/spellcheck")
-    public List<String> spellcheck(@QueryParam("misspellText") String misspellText) throws IOException, ParseException {
+    public String getSuggestion(@QueryParam("misspellText") String misspellText) throws IOException, ParseException {
+        return suggestCorrectSearchText(misspellText);
+    }
+
+    private String[] spellcheck(String misspellText) throws IOException, ParseException {
         File dir = new File(Constants.SPELLCHECK_INDEX_DIRECTORY);
         Directory directory = FSDirectory.open(dir.toPath());
         SpellChecker spellchecker = new SpellChecker(directory);
-        String[] suggestions = spellchecker.suggestSimilar(misspellText, 3);
+        String[] suggestions = spellchecker.suggestSimilar(misspellText, Constants.WORD_SUGGESTIONS_COUNT);
         spellchecker.close();
-        return Arrays.asList(suggestions);
+        return suggestions;
     }
 
+    private String suggestCorrectSearchText(String searchText) throws IOException, ParseException {
+        String[] terms = searchText.split(" ");
+        String[][] suggestionsMatrix = new String[terms.length][Constants.WORD_SUGGESTIONS_COUNT];
+        for(int i=0;i<terms.length;i++){
+            suggestionsMatrix[i] = spellcheck(terms[i]);
+        }
+
+        List<String> randomSuggestions = new ArrayList<>();
+        for(int i=0;i<20;i++){
+            String tempSuggestion = "";
+            for(int j=0;j<suggestionsMatrix.length;j++){
+                Random rnd = new Random();
+                int randomNumber = rnd.nextInt(suggestionsMatrix[j].length);
+                tempSuggestion+=suggestionsMatrix[j][randomNumber];
+            }
+            randomSuggestions.add(tempSuggestion);
+        }
+
+        int maxScore=0;
+        String bestSuggestion="";
+        for(String suggestion:randomSuggestions){
+            int currentScore = search(suggestion).size();
+            if(currentScore>maxScore){
+                maxScore=currentScore;
+                bestSuggestion=suggestion;
+            }
+        }
+        return bestSuggestion;
+    }
     private List<String> parse(File file) {
         List<String> lines = new ArrayList<>();
         String line = "";

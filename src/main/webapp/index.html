@@ -87,12 +87,7 @@
       	$.ajax({
           type : "GET",
           url : "rest/spellcheck?misspellText="+spellcheckText,
-          success : function(data) {
-            var suggestion="";
-            if(data.length != 0){
-                for(var i=0;i<data.length;i++){
-			        suggestion=suggestion.concat(data[i]+' ');
-		        }
+          success : function(suggestion) {
                 spellSuggestion.innerHTML='Do you mean: ' + suggestion;
                 $("#spellSuggestion").show();
             }
