@@ -88,7 +88,7 @@
           type : "GET",
           url : "rest/spellcheck?misspellText="+spellcheckText,
           success : function(suggestion) {
-                spellSuggestion.innerHTML='Do you mean: ' + suggestion;
+                spellSuggestion.innerHTML='<a onclick="clickOnSuggestion(\''+suggestion+'\')" href="#">Do you mean: ' + suggestion+'</a>';
                 $("#spellSuggestion").show();
           },
           error: function(xhr, textStatus, errorThrown){
@@ -97,6 +97,10 @@
       	});
 	  }
 
+    function clickOnSuggestion(suggestionText){
+        document.getElementById('searchText').value = suggestionText;
+        getResults();
+    }
 	function truncateText(text, maxLength) {
         if (text.length > maxLength) {
             text = text.substr(0,maxLength) + '...';
