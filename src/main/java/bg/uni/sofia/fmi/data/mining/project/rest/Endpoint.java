@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -35,6 +36,7 @@ public class Endpoint {
     @GET
     @Path("/spellcheck")
     public String getSuggestion(@QueryParam("misspellText") String misspellText) throws IOException, ParseException {
+        System.out.println("BEFORE SPELLCHECK:" + misspellText);
         return suggestCorrectSearchText(misspellText);
     }
 
@@ -51,23 +53,21 @@ public class Endpoint {
         String[] terms = searchText.split(" ");
         String[][] suggestionsMatrix = new String[terms.length][Constants.WORD_SUGGESTIONS_COUNT];
         for(int i=0;i<terms.length;i++){
-            suggestionsMatrix[i] = spellcheck(terms[i]);
+            String[] tmp = spellcheck(terms[i]);
+            if(tmp.length==0){
+                suggestionsMatrix[i] = new String[]{terms[i]};
+            }else{
+                suggestionsMatrix[i] = tmp;
+            }
+
+        }
+        System.out.println("SUGGESTION MATRIX");
+        for(String[] mtrx : suggestionsMatrix){
+            System.out.println(Arrays.toString(mtrx));
         }
 
-//        List<String> randomSuggestions = new ArrayList<>();
-//        for(int i=0;i<50;i++){
-//            String tempSuggestion = "";
-//            for(int j=0;j<suggestionsMatrix.length;j++){
-//                Random rnd = new Random();
-//                int randomNumber = rnd.nextInt(suggestionsMatrix[j].length);
-//                tempSuggestion+=suggestionsMatrix[j][randomNumber]+" ";
-//            }
-//            System.out.println(tempSuggestion);
-//            randomSuggestions.add(tempSuggestion);
-//        }
-
         List<String> randomSuggestions = combine(suggestionsMatrix);
-
+        System.out.println("SUGGESTIONS:" + randomSuggestions.toString());
         int maxScore=0;
         String bestSuggestion="";
         for(String suggestion:randomSuggestions){

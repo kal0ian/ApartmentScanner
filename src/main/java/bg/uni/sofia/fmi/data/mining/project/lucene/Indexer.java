@@ -18,7 +18,7 @@ public class Indexer {
 
     public Indexer(String dirPath) throws IOException {
         indexDir = createIndexDir(dirPath);
-        Analyzer analyzer = new StandardAnalyzer(new FileReader(new Utils().getStopWordsFileFromResources()));
+        Analyzer analyzer = new StandardAnalyzer(new Utils().getStopWordsFileFromResources());
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         indexWriter = createIndexWriter(indexDir, indexWriterConfig);

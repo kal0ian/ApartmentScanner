@@ -3,6 +3,7 @@ package bg.uni.sofia.fmi.data.mining.project.rest;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import bg.uni.sofia.fmi.data.mining.project.lucene.Utils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 
@@ -58,7 +59,7 @@ public class ContextLoader implements ServletContextListener{
 		File dir = new File(Constants.SPELLCHECK_INDEX_DIRECTORY);
 		Directory directory = FSDirectory.open(dir.toPath());
 		SpellChecker spellchecker = new SpellChecker(directory);
-		Dictionary dic = new PlainTextDictionary(new File(Constants.SPELLCHECK_DICTIONARY).toPath());
+		Dictionary dic = new PlainTextDictionary(new Utils().getApartmentDictionary().toPath());
 		spellchecker.indexDictionary(dic,new IndexWriterConfig(new StandardAnalyzer()),true);
 		spellchecker.close();
 
