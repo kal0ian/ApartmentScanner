@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -11,22 +12,54 @@
 	<body>
 
 		<div class="container">
+			<a href="#" ><img class="center-block" src="./logo.png" /></a>
 			<div class="row">
-				<div class="col-sm-6 col-sm-offset-3">
-					<div id="imaginary_container"> 
-						<a href="#" ><img class="center-block" src="./logo.png" /></a>
-						<div class="input-group stylish-input-group">
-							<input id="searchText" type="text" class="form-control"  placeholder="Search" >
-							<span class="input-group-addon">
-								<button id="submit" class="submit" type="submit">
-									<span class="glyphicon glyphicon-search"></span>
-								</button>  
-							</span>
+				<div class="col-md-12">
+					<div class="input-group" id="adv-search">
+						<input id="searchText" type="text" class="form-control" placeholder="Search" />
+						<div class="input-group-btn">
+							<div class="btn-group" role="group">
+								<div class="dropdown dropdown-lg">
+									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
+									<div class="dropdown-menu dropdown-menu-right" role="menu">
+										<form class="form-horizontal" role="form">
+										  <div class="form-group">
+											<label for="contain">Address:</label>
+											<input id="address" class="form-control" type="text" placeholder="Address" />
+										  </div>
+										  <div class="form-group">
+											<label for="contain">Area From:</label>
+											<input id="areaFrom" class="form-control" type="number" placeholder="Area from" />
+										  </div>
+										  <div class="form-group">
+											<label for="contain">Area To:</label>
+											<input id="areaTo" class="form-control" type="number" placeholder="Area to" />
+										  </div>
+										  
+										  <div class="form-group">
+											<label>Floor From:</label>
+											<select id="floorFrom" class="form-control">
+												<option value="0" selected></option>
+											</select>
+										  </div>
+										  <div class="form-group">
+											<label>Floor to:</label>
+											<select id="floorТо" class="form-control">
+												<option value="0" selected></option>
+											</select>
+										  </div>
+										</form>
+									</div>
+								</div>
+								<button class="btn btn-warning submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+							</div>
 						</div>
 					</div>
+				  </div>
 				</div>
 			</div>
 		</div>
+		
 		
 		<div id="searchResults" class="container">
 			<hgroup class="mb20">
@@ -40,10 +73,14 @@
 	</body>
 	<script>
 	$("#searchResults").hide();
+	fillFloorFromValues();
+	fillFloorToValues();
+	
 
-	  $(".submit").click(function() {
-		    getResults();
-	  });
+	$(".submit").click(function() {
+		getResults();
+	});
+
 
 	 $("#searchText").keyup(function(event){
 	        if(event.keyCode == '13'){
@@ -52,10 +89,15 @@
 	    });
 	  
 	 function getResults() {
-	  	var searchText = document.getElementById('searchText').value;
+		var searchText = $('#searchText').val();
+		var address = $('#address').val();
+		var areaFrom = $('#areaFrom').val();
+		var areaTo = $('#areaTo').val();
+		var floorFrom = $( "#floorFrom option:selected" ).text();
+		var floorTo = $( "#floorТо option:selected" ).text();
       	$.ajax({
           type : "GET",
-          url : "rest/search?searchText="+searchText,
+          url : "rest/search?searchText="+searchText+"&address="+address+"&areaFrom="+areaFrom+"&areaTo="+areaTo+"&floorFrom="+floorFrom+"&floorTo="+floorTo,
           success : function(data) {
           	var invitations = '';
                 if(data.length == 0){
@@ -77,16 +119,22 @@
               $("#searchResults").show();
           },
           error: function(xhr, textStatus, errorThrown){
-              alert("ERROR!!!");
+              alert(textStatus);
+			  alert(errorThrown);
           }
       	});
 	  }
 
 	 function checkSpelling(spellcheckText) {
+		var address = $('#address').val();
+		var areaFrom = $('#areaFrom').val();
+		var areaTo = $('#areaTo').val();
+		var floorFrom = $( "#floorFrom option:selected" ).text();
+		var floorTo = $( "#floorТо option:selected" ).text();
 	  	var spellSuggestion = document.getElementById('spellSuggestion');
       	$.ajax({
           type : "GET",
-          url : "rest/spellcheck?misspellText="+spellcheckText,
+          url : "rest/spellcheck?misspellText="+spellcheckText+"&address="+address+"&areaFrom="+areaFrom+"&areaTo="+areaTo+"&floorFrom="+floorFrom+"&floorTo="+floorTo,
           success : function(suggestion) {
               if(suggestion){
                 spellSuggestion.innerHTML='<a onclick="clickOnSuggestion(\''+suggestion+'\')" href="#">Do you mean: ' + suggestion+'</a>';
@@ -94,7 +142,8 @@
               }
           },
           error: function(xhr, textStatus, errorThrown){
-              alert("ERROR!!!");
+              alert(textStatus);
+			  alert(errorThrown);
           }
       	});
 	  }
@@ -109,5 +158,33 @@
         }
         return text;
     }
+	
+	function fillFloorFromValues(){
+		var sel = document.getElementById('floorFrom');
+		var opt = document.createElement('option');
+		opt.innerHTML = "Партер";
+		opt.value = 1;
+		sel.appendChild(opt);
+		for(var i = 2; i < 28; i++) {
+			var opt = document.createElement('option');
+			opt.innerHTML = i-1;
+			opt.value = i;
+			sel.appendChild(opt);
+		}
+	}
+
+	function fillFloorToValues(){
+		var sel = document.getElementById('floorТо');
+		var opt = document.createElement('option');
+		opt.innerHTML = "Партер";
+		opt.value = 1;
+		sel.appendChild(opt);
+		for(var i = 2; i < 28; i++) {
+			var opt = document.createElement('option');
+			opt.innerHTML = i-1;
+			opt.value = i;
+			sel.appendChild(opt);
+		}
+	}
 	</script>
 </html>
