@@ -8,11 +8,10 @@ def getNextPage():
 	for x in range(1,51):
 		page = requests.get(pageBase+str(x))
 		crawlPageAndGetLink(page, linkList)
-	getAdsDetails(linkList)
+	return linkList
 
 
 def crawlPageAndGetLink(page, linkList):
-	links=list()
 	pageBase = "http://www.imoti.com/pcgi/"
 	soup = BeautifulSoup(page.content, 'html.parser')
 	ads = soup.find_all('div', class_='item')
@@ -87,9 +86,8 @@ def getMainInfo(bs):
 def getPhoneNum(bs):
 	return bs.find_all('td', class_='info')[0].find_all('div')[1].get_text()
 
-
 def main():
-	getNextPage()
+	getAdsDetails(getNextPage())
 
 if __name__ == '__main__':
 	main()

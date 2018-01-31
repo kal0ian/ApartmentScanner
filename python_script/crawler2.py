@@ -3,18 +3,17 @@ import requests
 import os.path
 
 def getNextPage():
-	pageBase = "https://www.imot.bg/pcgi/imot.cgi?act=3&slink=3f2cvk&f1="
+	pageBase = "https://www.imot.bg/pcgi/imot.cgi?act=3&slink=3gaqet&f1="
 	linkList = list()
 	for x in range(1,26):
 		page = requests.get(pageBase+str(x))
 		crawlPageAndGetLink(page, linkList)
-	getAdsDetails(linkList)
-
+	return linkList
 
 def crawlPageAndGetLink(page, linkList):
 	soup = BeautifulSoup(page.content, 'html.parser')
 	ads = soup.find_all('td', valign = 'top', width = '270', height='40', style="padding-left:4px")
-	links=list()
+	print(ads)
 	for item in ads:
 		for a in item.find_all('a', class_="lnk1"):
 			linkList.append('https:'+a['href'])
@@ -85,7 +84,7 @@ def getPhoneNum(bs):
 
 
 def main():
-	getNextPage()
+	getAdsDetails(getNextPage())
 
 if __name__ == '__main__':
 	main()
