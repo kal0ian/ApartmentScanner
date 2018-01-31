@@ -45,7 +45,7 @@ public class ContextLoader implements ServletContextListener{
 		try {
 			indexer = new Indexer(Constants.INDEX_DIRECTORY);
 			ApartmentDocumentCreator apartmentDocumentCreator = new ApartmentDocumentCreator();
-			List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new File(Constants.DOCUMENTS_DIRECTORY));
+			List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new Utils().getApartmentDocumentsDirectory());
 			indexer.indexDocuments(documents);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
