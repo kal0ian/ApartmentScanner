@@ -1,16 +1,16 @@
-package bg.uni.sofia.fmi.data.mining.project.lucene;
+package bg.uni.sofia.fmi.data.mining.project.utils;
 
-import bg.uni.sofia.fmi.data.mining.project.rest.Constants;
+import bg.uni.sofia.fmi.data.mining.project.utils.Constants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 
-public final class Utils {
+public final class ResourcesUtils {
 
     private ClassLoader classLoader;
-    public Utils() {
+    public ResourcesUtils() {
         classLoader = getClass().getClassLoader();
     }
     

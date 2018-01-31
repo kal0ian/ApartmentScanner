@@ -1,6 +1,8 @@
 package bg.uni.sofia.fmi.data.mining.project.rest;
 
 import bg.uni.sofia.fmi.data.mining.project.lucene.*;
+import bg.uni.sofia.fmi.data.mining.project.utils.Constants;
+import bg.uni.sofia.fmi.data.mining.project.utils.ResourcesUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -51,7 +53,7 @@ public class Endpoint {
         File indexDir = new File(Constants.INDEX_DIRECTORY);
         IndexReader indexReader = DirectoryReader.open(FSDirectory.open(indexDir.toPath()));
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-        Analyzer analyzer = new StandardAnalyzer(new Utils().getStopWordsFileFromResources());
+        Analyzer analyzer = new StandardAnalyzer(new ResourcesUtils().getStopWordsFileFromResources());
 
         //MultiFieldQueryParser queryParser = new MultiFieldQueryParser(
         //       new String[]{"title", "content"},

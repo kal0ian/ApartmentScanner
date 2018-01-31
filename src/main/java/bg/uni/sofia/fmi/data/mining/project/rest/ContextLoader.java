@@ -3,7 +3,8 @@ package bg.uni.sofia.fmi.data.mining.project.rest;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import bg.uni.sofia.fmi.data.mining.project.lucene.Utils;
+import bg.uni.sofia.fmi.data.mining.project.utils.ResourcesUtils;
+import bg.uni.sofia.fmi.data.mining.project.utils.Constants;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 
@@ -45,7 +46,7 @@ public class ContextLoader implements ServletContextListener{
 		try {
 			indexer = new Indexer(Constants.INDEX_DIRECTORY);
 			ApartmentDocumentCreator apartmentDocumentCreator = new ApartmentDocumentCreator();
-			List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new Utils().getApartmentDocumentsDirectory());
+			List<Document> documents = apartmentDocumentCreator.createDocumentsFromDir(new ResourcesUtils().getApartmentDocumentsDirectory());
 			indexer.indexDocuments(documents);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -59,7 +60,7 @@ public class ContextLoader implements ServletContextListener{
 		File dir = new File(Constants.SPELLCHECK_INDEX_DIRECTORY);
 		Directory directory = FSDirectory.open(dir.toPath());
 		SpellChecker spellchecker = new SpellChecker(directory);
-		Dictionary dic = new PlainTextDictionary(new Utils().getApartmentDictionary().toPath());
+		Dictionary dic = new PlainTextDictionary(new ResourcesUtils().getApartmentDictionary().toPath());
 		spellchecker.indexDictionary(dic,new IndexWriterConfig(new StandardAnalyzer()),true);
 		spellchecker.close();
 
