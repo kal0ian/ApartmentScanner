@@ -1,6 +1,5 @@
 package bg.uni.sofia.fmi.data.mining.project.lucene;
 
-import bg.uni.sofia.fmi.data.mining.project.utils.ResourcesUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -19,7 +18,7 @@ public class Indexer {
 
     public Indexer(String dirPath) throws IOException {
         indexDir = createIndexDir(dirPath);
-        Analyzer analyzer = new StandardAnalyzer(new ResourcesUtils().getStopWordsFileFromResources());
+        Analyzer analyzer = new StandardAnalyzer(new Utils().getStopWordsFileFromResources());
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         indexWriter = createIndexWriter(indexDir, indexWriterConfig);

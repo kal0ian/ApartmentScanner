@@ -1,4 +1,4 @@
-package bg.uni.sofia.fmi.data.mining.project.utils;
+package bg.uni.sofia.fmi.data.mining.project.rest;
 
 public final class Constants {
 	public final static int WORD_SUGGESTIONS_COUNT = 5;

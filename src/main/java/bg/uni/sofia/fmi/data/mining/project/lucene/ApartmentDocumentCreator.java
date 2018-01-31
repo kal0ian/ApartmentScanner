@@ -9,11 +9,6 @@ import java.util.List;
 
 public class ApartmentDocumentCreator extends DocumentCreator {
 
-    private static final String SPACE = " ";
-    private static final String DOT = ".";
-    private static final String EMPTY_STRING = "";
-    private static final String DASH = "-";
-
     @Override
     public Document createDocument(File file) {
         Document document = new Document();
@@ -37,16 +32,18 @@ public class ApartmentDocumentCreator extends DocumentCreator {
         int i=0;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             while ((line = br.readLine()) != null) {
+                System.out.println("Before processing: " + line);
+                System.out.println("Before processing: " + file.getAbsolutePath());
                 if(i==4){
-                    line = line.substring(0,line.indexOf(SPACE));
+                    line = line.substring(0,line.indexOf(" "));
                 }
                 if(i==5){
                     if(!Character.isDigit(line.charAt(0))) {
                         line = "0";
-                    }else if(EMPTY_STRING.equals(line) || DASH.equals(line) || line.contains(DOT)){
+                    }else if("".equals(line) || "-".equals(line) || line.contains(".")){
                         line="-1";
                     }else{
-                        line = line.substring(0,line.indexOf(DASH));
+                        line = line.substring(0,line.indexOf("-"));
                     }
                 }
                 lines.add(line);
