@@ -12,16 +12,15 @@ def getNextPage():
 
 
 def crawlPageAndGetLink(page, linkList):
+	links=list()
 	pageBase = "http://www.imoti.com/pcgi/"
 	soup = BeautifulSoup(page.content, 'html.parser')
 	ads = soup.find_all('div', class_='item')
-	for i in range(5):
-		del ads[0]
-	links=list()
+	ads = ads[5:]
 	for item in ads:
-		links.extend(item.find_all('a', href=True))
-	for a in links:
-		linkList.append(pageBase+a['href'])
+		for a in item.find_all('a', href=True):
+			linkList.append(pageBase+a['href'])
+
 
 def getAdsDetails(linkList):
 	for i in range(len(linkList)):
@@ -32,9 +31,8 @@ def getAdsDetails(linkList):
 			continue
 		except UnicodeEncodeError:
 			print('fileunicode'+str(i))
-			if(os.path.isfile('E:\\ApartmentScanner\\apartment'+str(i))) {
+			if(os.path.isfile('E:\\ApartmentScanner\\apartment'+str(i))):
 				os.remove('E:\\ApartmentScanner\\apartment'+str(i))
-			}
 			continue
 
 def saveAdToFile(url, i):

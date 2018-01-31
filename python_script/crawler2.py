@@ -6,12 +6,8 @@ def getNextPage():
 	pageBase = "https://www.imot.bg/pcgi/imot.cgi?act=3&slink=3f2cvk&f1="
 	linkList = list()
 	for x in range(1,26):
-		try:
-			page = requests.get(pageBase+str(x))
-			crawlPageAndGetLink(page, linkList)
-		except Exception as e:
-			print("Exception at page "+str(x))
-			continue
+		page = requests.get(pageBase+str(x))
+		crawlPageAndGetLink(page, linkList)
 	getAdsDetails(linkList)
 
 
@@ -20,9 +16,8 @@ def crawlPageAndGetLink(page, linkList):
 	ads = soup.find_all('td', valign = 'top', width = '270', height='40', style="padding-left:4px")
 	links=list()
 	for item in ads:
-		links.extend(item.find_all('a', class_="lnk1"))
-	for a in links:
-		linkList.append('https:'+a['href'])
+		for a in item.find_all('a', class_="lnk1"):
+			linkList.append('https:'+a['href'])
 
 def getAdsDetails(linkList):
 	for i in range(1000,1000+len(linkList)):
