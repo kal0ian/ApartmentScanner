@@ -1,7 +1,5 @@
 package bg.uni.sofia.fmi.data.mining.project.utils;
 
-import bg.uni.sofia.fmi.data.mining.project.utils.Constants;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
