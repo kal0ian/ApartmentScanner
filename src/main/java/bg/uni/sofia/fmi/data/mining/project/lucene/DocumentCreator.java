@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DocumentCreator {
+
     public abstract Document createDocument(File file);
 
     public List<Document> createDocumentsFromDir(File dir) {

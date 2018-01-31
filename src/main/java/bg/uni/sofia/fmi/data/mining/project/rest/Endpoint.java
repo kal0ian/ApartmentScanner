@@ -1,6 +1,8 @@
 package bg.uni.sofia.fmi.data.mining.project.rest;
 
 import bg.uni.sofia.fmi.data.mining.project.lucene.*;
+import bg.uni.sofia.fmi.data.mining.project.utils.Constants;
+import bg.uni.sofia.fmi.data.mining.project.utils.ResourcesUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -26,60 +28,56 @@ import java.util.List;
 
 @Path("/")
 public class Endpoint {
+    private static final String EMPTY_STRING = "";
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
     public List<ResultApartment> findResults(@QueryParam("searchText") String searchText, @QueryParam("address") String address, @QueryParam("areaFrom") String areaFrom, @QueryParam("areaTo") String areaTo, @QueryParam("floorFrom") String floorFrom, @QueryParam("floorTo") String floorTo) throws IOException, ParseException {
-//        if (address == null || "".equals(address)) {
-//            return search(searchText);
-//        }
         return search(searchText, address, areaFrom, areaTo, floorFrom, floorTo);
     }
 
-    private List<ResultApartment> search(String searchText) throws IOException, ParseException {
-        File indexDir = new File(Constants.INDEX_DIRECTORY);
-        List<String> resultFilesPaths = Searcher.search(FSDirectory.open(indexDir.toPath()), searchText);
-        List<ResultApartment> results = new ArrayList<>();
-        for (String pathToFile : resultFilesPaths) {
-            results.add(createResultApartment(parse(new File(pathToFile))));
+    @GET
+    @Path("/spellcheck")
+    public String getSuggestion(@QueryParam("misspellText") String misspellText, @QueryParam("address") String address, @QueryParam("areaFrom") String areaFrom, @QueryParam("areaTo") String areaTo, @QueryParam("floorFrom") String floorFrom, @QueryParam("floorTo") String floorTo) throws IOException, ParseException {
+        if(EMPTY_STRING.equals(misspellText)){
+            return EMPTY_STRING;
         }
-        return results;
+        return suggestCorrectSearchText(misspellText,address,areaFrom,areaTo,floorFrom,floorTo);
     }
+
+//    private List<ResultApartment> search(String searchText) throws IOException, ParseException {
+//        File indexDir = new File(Constants.INDEX_DIRECTORY);
+//        List<String> resultFilesPaths = ApartmentSearcher.search(FSDirectory.open(indexDir.toPath()), searchText);
+//        List<ResultApartment> results = new ArrayList<>();
+//        for (String pathToFile : resultFilesPaths) {
+//            results.add(createResultApartment(parse(new File(pathToFile))));
+//        }
+//        return results;
+//    }
 
     private List<ResultApartment> search(String searchText, String address, String areaFrom, String areaTo, String floorFrom, String floorTo) throws IOException, ParseException {
         File indexDir = new File(Constants.INDEX_DIRECTORY);
         IndexReader indexReader = DirectoryReader.open(FSDirectory.open(indexDir.toPath()));
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-        Analyzer analyzer = new StandardAnalyzer(new Utils().getStopWordsFileFromResources());
-
-        //MultiFieldQueryParser queryParser = new MultiFieldQueryParser(
-        //       new String[]{"title", "content"},
-        //        analyzer);
-        //QueryParser queryParser = new QueryParser("floor",analyzer);
-
-        // if floorFrom contains "Parter"
-
-
-        //String special = "title:" + searchText + " OR content:" + searchText + " OR address:" + address + " AND area:[" + areaFrom
-        //        + " TO " + areaTo + "] AND floor:[" + floorFrom + " TO " + floorTo + "]";
+        Analyzer analyzer = new StandardAnalyzer(new ResourcesUtils().getStopWordsFileFromResources());
 
         BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
-        if(null != searchText && !"".equals(searchText)){
+        if(null != searchText && !EMPTY_STRING.equals(searchText)){
             Query titleQuery = new QueryParser("title", analyzer).parse(searchText);
             Query contentQuery = new QueryParser("content", analyzer).parse(searchText);
             booleanQueryBuilder.add(titleQuery, BooleanClause.Occur.SHOULD)
                     .add(contentQuery, BooleanClause.Occur.SHOULD);
         }
-        if(null != address && !"".equals(address)){
+        if(null != address && !EMPTY_STRING.equals(address)){
             Query addressQuery = new QueryParser("address", analyzer).parse(address);
             booleanQueryBuilder.add(addressQuery, BooleanClause.Occur.SHOULD);
         }
-        if(null != areaFrom && !"".equals(areaFrom) && null != areaTo && !"".equals(areaTo)){
+        if(null != areaFrom && !EMPTY_STRING.equals(areaFrom) && null != areaTo && !EMPTY_STRING.equals(areaTo)){
             Query areaRangeQuery = IntPoint.newRangeQuery("area", Integer.parseInt(areaFrom), Integer.parseInt(areaTo));
             booleanQueryBuilder.add(areaRangeQuery, BooleanClause.Occur.MUST);
         }
-        if(null != floorFrom && !"".equals(floorFrom) && null != floorTo && !"".equals(floorTo)){
+        if(null != floorFrom && !EMPTY_STRING.equals(floorFrom) && null != floorTo && !EMPTY_STRING.equals(floorTo)){
             if (!Character.isDigit(floorFrom.charAt(0))) {
                 floorFrom = "0";
             }
@@ -97,8 +95,6 @@ public class Endpoint {
         List<String> resultFilesPaths = new ArrayList<>();
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document doc = indexSearcher.doc(scoreDoc.doc);
-            //System.out.println(doc.get("path_to_file") +" score: "+ scoreDoc.score);
-            //System.out.println(indexSearcher.explain(query, scoreDoc.doc));
             resultFilesPaths.add(doc.get("path_to_file")); //parameter
         }
         indexReader.close();
@@ -109,15 +105,7 @@ public class Endpoint {
         return results;
     }
 
-    @GET
-    @Path("/spellcheck")
-    public String getSuggestion(@QueryParam("misspellText") String misspellText, @QueryParam("address") String address, @QueryParam("areaFrom") String areaFrom, @QueryParam("areaTo") String areaTo, @QueryParam("floorFrom") String floorFrom, @QueryParam("floorTo") String floorTo) throws IOException, ParseException {
-        System.out.println("BEFORE SPELLCHECK:" + misspellText);
-        if("".equals(misspellText)){
-            return "";
-        }
-        return suggestCorrectSearchText(misspellText,address,areaFrom,areaTo,floorFrom,floorTo);
-    }
+
 
     private String[] spellcheck(String misspellText) throws IOException, ParseException {
         File dir = new File(Constants.SPELLCHECK_INDEX_DIRECTORY);
@@ -162,7 +150,7 @@ public class Endpoint {
 
     private List<String> parse(File file) {
         List<String> lines = new ArrayList<>();
-        String line = "";
+        String line = EMPTY_STRING;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             while ((line = br.readLine()) != null) {
                 lines.add(line);
